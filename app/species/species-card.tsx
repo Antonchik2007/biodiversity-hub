@@ -11,29 +11,46 @@ React server components don't track state between rerenders, so leaving the uniq
 can cause errors with matching props and state in child components if the list order changes.
 */
 import type { Database } from "@/lib/schema";
+import { ImageOff } from "lucide-react";
 import Image from "next/image";
-import SpeciesDetailsDialog from "./species-details-dialog";
 import { useState } from "react";
+import SpeciesDetailsDialog from "./species-details-dialog";
 type Species = Database["public"]["Tables"]["species"]["Row"];
 
-
-export default function SpeciesCard({ species, userId }: { species: Species, userId: string }) {
-
+export default function SpeciesCard({ species, userId }: { species: Species; userId: string }) {
   //utilize local copy of species for instant update on front-end
   const [localSpecies, setLocalSpecies] = useState(species);
 
+  //Some images don't load
+  const [imageFailed, setImageFailed] = useState(false);
+
   return (
     <div className="m-4 w-72 min-w-72 flex-none rounded border-2 p-3 shadow">
-      {localSpecies.image && (
-        <div className="relative h-40 w-full">
-          <Image src={localSpecies.image} alt={localSpecies.scientific_name} fill style={{ objectFit: "cover" }} />
-        </div>
-      )}
+      {localSpecies.image &&
+        (imageFailed ? (
+          <div
+            role="img"
+            aria-label={`No image available for ${localSpecies.scientific_name}`}
+            className="flex h-40 w-full items-center justify-center rounded bg-muted text-muted-foreground"
+          >
+            <ImageOff className="h-8 w-8" aria-hidden="true" />
+          </div>
+        ) : (
+          <div className="relative h-40 w-full">
+            <Image
+              src={localSpecies.image}
+              alt={localSpecies.scientific_name}
+              fill
+              style={{ objectFit: "cover" }}
+              onError={() => setImageFailed(true)}
+            />
+          </div>
+        ))}
       <h3 className="mt-3 text-2xl font-semibold">{localSpecies.scientific_name}</h3>
       <h4 className="text-lg font-light italic">{localSpecies.common_name}</h4>
       <p>{localSpecies.description ? localSpecies.description.slice(0, 150).trim() + "..." : ""}</p>
       {/* Replace the button with the detailed view dialog. */}
-      <SpeciesDetailsDialog localSpecies={localSpecies} setLocalSpecies={setLocalSpecies} userId={userId}/>
+      <SpeciesDetailsDialog localSpecies={localSpecies} setLocalSpecies={setLocalSpecies} userId={userId} />
     </div>
   );
 }
