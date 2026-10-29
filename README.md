@@ -38,7 +38,3 @@ Next.js 14 (App Router), TypeScript, Supabase (PostgreSQL, Auth), Tailwind CSS w
 - The chatbot is single-turn: each request sends only the current message, no conversation history.
 - No streaming; a reply renders once it's complete.
 - No automated tests yet.
-
-## Running it locally
-
-Follow [SETUP.md](SETUP.md) (T4SG's original setup guide: create a Supabase project, fill in `.env`, run `setup.sql` and `seed.sql`, then `npm run dev`). Then run `supabase/comments.sql` in the Supabase SQL editor and add `ANTHROPIC_API_KEY` to `.env` for the chatbot.
